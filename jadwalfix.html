@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timesheet Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            padding: 15px 10px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #e3f2fd;
+            transition: all 0.3s ease;
+        }
+
+        .date-cell, .time-cell {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+            font-weight: 500;
+        }
+
+        .date-cell:hover, .time-cell:hover {
+            border-color: #667eea;
+            background: #e3f2fd;
+            transform: scale(1.02);
+        }
+
+        .time-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 120px;
+        }
+
+        .time-item {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .time-item .time-cell {
+            min-width: 80px;
+            font-size: 14px;
+        }
+
+        .add-time-btn, .remove-time-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-time-btn {
+            background: #dc3545;
+        }
+
+        .add-time-btn:hover {
+            background: #218838;
+        }
+
+        .remove-time-btn:hover {
+            background: #c82333;
+        }
+
+        .jam-putar {
+            background-color: #e8f5e8 !important;
+            font-weight: bold;
+            color: #2e7d32;
+            font-size: 16px;
+            padding: 12px;
+        }
+
+        .jam-putar-item {
+            background: #f0f8f0;
+            border: 1px solid #c8e6c8;
+            border-radius: 6px;
+            padding: 6px 10px;
+            margin: 2px 0;
+            font-size: 14px;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.3);
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 15px;
+        }
+
+        .row-number {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-group select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        }
+
+        .empty-time {
+            color: #999;
+            font-style: italic;
+            font-size: 12px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .modal-content {
+                margin: 5% auto;
+                padding: 20px;
+                width: 95%;
+            }
+
+            .time-list-container {
+                min-width: 100px;
+            }
+
+            .time-item .time-cell {
+                min-width: 60px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⏰ Timesheet Calculator</h1>
+            <p>Sistem Pencatatan Waktu Kerja Otomatis</p>
+        </div>
+        
+        <div class="content">
+            <div class="controls">
+                <button onclick="addRow()">➕ Tambah Baris</button>
+                <button onclick="clearAll()">🗑️ Hapus Semua</button>
+                <button onclick="exportData()">📊 Export Data</button>
+            </div>
+            
+            <div class="info-box">
+                <h3>📝 Cara Penggunaan:</h3>
+                <p><strong>📅 Tanggal ON:</strong> Klik untuk edit, tanggal OFF otomatis mengikuti</p>
+                <p><strong>🕐 Jam:</strong> Klik pada jam untuk edit (format: 10.00)</p>
+                
+            </div>
+            
+            <div class="table-container">
+                <table id="timesheet">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>TANGGAL ON</th>
+                            <th>JAM ON</th>
+                            <th>TANGGAL OFF</th>
+                            <th>JAM OFF</th>
+                            <th>JAM PUTAR</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Rows will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Date Edit -->
+   <!-- Modal for Date Edit -->
+<div id="dateModal" class="modal">
+    <div class="modal-content">
+        <h3>📅 Edit Tanggal</h3>
+        <div class="form-group">
+            <label>Tanggal:</label>
+            <select id="dateSelect">
+                <!-- Will be populated by JS -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Bulan:</label>
+            <select id="monthSelect">
+                <option value="01">Januari (01)</option>
+                <option value="02">Februari (02)</option>
+                <option value="03">Maret (03)</option>
+                <option value="04">April (04)</option>
+                <option value="05">Mei (05)</option>
+                <option value="06">Juni (06)</option>
+                <option value="07">Juli (07)</option>
+                <option value="08">Agustus (08)</option>
+                <option value="09">September (09)</option>
+                <option value="10">Oktober (10)</option>
+                <option value="11">November (11)</option>
+                <option value="12">Desember (12)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Tahun:</label>
+            <select id="yearSelect">
+                <option value="22">2022</option>
+                <option value="23">2023</option>
+                <option value="24">2024</option>
+                <option value="25">2025</option>
+                <option value="26">2026</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Hari:</label>
+            <div id="dayPreview" style="padding: 10px; background: #f0f8ff; border-radius: 5px; font-weight: bold; color: #667eea;">-</div>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-save" onclick="saveDateEdit()">✅ Simpan</button>
+            <button class="btn-cancel" onclick="closeDateModal()">❌ Batal</button>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal for Time Edit -->
+    <div id="timeModal" class="modal">
+        <div class="modal-content">
+            <h3>🕐 Edit Jam</h3>
+            <div class="form-group">
+                <label>Jam:</label>
+                <select id="hourSelect">
+                    <!-- Will be populated by JS -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Menit:</label>
+                <select id="minuteSelect">
+                    <option value="00">00</option>
+                    <option value="15">15</option>
+                    <option value="30">30</option>
+                    <option value="45">45</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="saveTimeEdit()">✅ Simpan</button>
+                <button class="btn-cancel" onclick="closeTimeModal()">❌ Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let data = [];
+        let currentEditIndex = -1;
+        let currentEditType = '';
+        let currentTimeIndex = -1;
+
+        // Initialize with first row
+        function init() {
+    data = [{
+        day: 'Rabu',
+        date: '01',
+        month: '06',
+        year: '22',
+        dayOff: 'Rabu',    // Auto sama dengan ON
+        dateOff: '01',     // Auto sama dengan ON
+        monthOff: '06',    // Auto sama dengan ON
+        yearOff: '22',     // Auto sama dengan ON
+        jamOn: [{
+            hour: '08',
+            minute: '00'
+        }],
+        jamOff: [],
+        jamPutarList: []
+    },
+    {
+        day: 'Kamis',
+        date: '02',
+        month: '06',
+        year: '22',
+        dayOff: 'Kamis',   // Auto sama dengan ON
+        dateOff: '02',     // Auto sama dengan ON
+        monthOff: '06',    // Auto sama dengan ON
+        yearOff: '22',     // Auto sama dengan ON
+        jamOn: [],
+        jamOff: [{
+            hour: '10',
+            minute: '00'
+        }],
+        jamPutarList: []
+    }];
+    
+    populateSelects();
+    calculateAllJamPutar();
+    renderTable();
+}
+        function populateSelects() {
+            // Populate date select (1-31)
+            const dateSelect = document.getElementById('dateSelect');
+            dateSelect.innerHTML = '';
+            for (let i = 1; i <= 31; i++) {
+                const option = document.createElement('option');
+                option.value = i.toString().padStart(2, '0');
+                option.textContent = i.toString().padStart(2, '0');
+                dateSelect.appendChild(option);
+            }
+
+            // Populate hour select (0-23)
+            const hourSelect = document.getElementById('hourSelect');
+            hourSelect.innerHTML = '';
+            for (let i = 0; i <= 23; i++) {
+                const option = document.createElement('option');
+                option.value = i.toString().padStart(2, '0');
+                option.textContent = i.toString().padStart(2, '0');
+                hourSelect.appendChild(option);
+            }
+        }
+
+        function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    
+    data.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        
+        // Create JAM ON list
+        let jamOnHtml = '<div class="time-list-container">';
+        if (row.jamOn.length === 0) {
+            jamOnHtml += '<div class="empty-time">-</div>';
+        } else {
+            row.jamOn.forEach((jamOn, jamIndex) => {
+                jamOnHtml += `
+                    <div class="time-item">
+                        <div class="time-cell" onclick="editTime(${index}, 'on', ${jamIndex})">
+                            ${jamOn.hour}.${jamOn.minute}
+                        </div>
+                        <button class="remove-time-btn" onclick="removeJamOn(${index}, ${jamIndex})" title="Hapus jam ON">×</button>
+                    </div>
+                `;
+            });
+        }
+        jamOnHtml += `
+            <div class="time-item">
+                <button class="add-time-btn" onclick="addJamOn(${index})" title="Tambah jam ON">+</button>
+            </div>
+        </div>`;
+
+        // Create JAM OFF list
+        let jamOffHtml = '<div class="time-list-container">';
+        if (row.jamOff.length === 0) {
+            jamOffHtml += '<div class="empty-time">-</div>';
+        } else {
+            row.jamOff.forEach((jamOff, jamIndex) => {
+                jamOffHtml += `
+                    <div class="time-item">
+                        <div class="time-cell" onclick="editTime(${index}, 'off', ${jamIndex})">
+                            ${jamOff.hour}.${jamOff.minute}
+                        </div>
+                        <button class="remove-time-btn" onclick="removeJamOff(${index}, ${jamIndex})" title="Hapus jam OFF">×</button>
+                    </div>
+                `;
+            });
+        }
+        jamOffHtml += `
+            <div class="time-item">
+                <button class="add-time-btn" onclick="addJamOff(${index})" title="Tambah jam OFF">+</button>
+            </div>
+        </div>`;
+
+        // Create JAM PUTAR list
+        let jamPutarHtml = '<div class="time-list-container">';
+        if (row.jamPutarList.length === 0) {
+            jamPutarHtml += '<div class="empty-time">-</div>';
+        } else {
+            row.jamPutarList.forEach((jamPutar, jamIndex) => {
+                jamPutarHtml += `
+                    <div class="jam-putar-item">
+                        ${jamPutar.toFixed(3)}
+                    </div>
+                `;
+            });
+        }
+        jamPutarHtml += '</div>';
+
+        tr.innerHTML = `
+            <td class="row-number">${index + 1}</td>
+            <td>
+                <div class="date-cell" onclick="editDate(${index}, 'on')">
+                    ${row.day}/${row.date}-${row.month}-${row.year}
+                </div>
+            </td>
+            <td>
+                ${jamOnHtml}
+            </td>
+            <td>
+                <div class="date-cell" onclick="editDate(${index}, 'off')">
+                    ${row.dayOff}/${row.dateOff}-${row.monthOff}-${row.yearOff}
+                </div>
+            </td>
+            <td>
+                ${jamOffHtml}
+            </td>
+            <td class="jam-putar">${jamPutarHtml}</td>
+            <td><button class="delete-btn" onclick="deleteRow(${index})">🗑️</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+        // Function to get day name from date
+function getDayName(date, month, year) {
+    const fullYear = 2000 + parseInt(year);
+    const dateObj = new Date(fullYear, parseInt(month) - 1, parseInt(date));
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    return days[dateObj.getDay()];
+}
+
+// Function to update day preview
+function updateDayPreview() {
+    const date = document.getElementById('dateSelect').value;
+    const month = document.getElementById('monthSelect').value;
+    const year = document.getElementById('yearSelect').value;
+    
+    if (date && month && year) {
+        const dayName = getDayName(date, month, year);
+        document.getElementById('dayPreview').textContent = dayName;
+    }
+}
+        function addJamOn(rowIndex) {
+            data[rowIndex].jamOn.push({
+                hour: '08',
+                minute: '00'
+            });
+            calculateAllJamPutar();
+            renderTable();
+        }
+
+        function addJamOff(rowIndex) {
+            data[rowIndex].jamOff.push({
+                hour: '10',
+                minute: '00'
+            });
+            calculateAllJamPutar();
+            renderTable();
+        }
+
+        function removeJamOn(rowIndex, jamIndex) {
+            data[rowIndex].jamOn.splice(jamIndex, 1);
+            calculateAllJamPutar();
+            renderTable();
+        }
+
+        function removeJamOff(rowIndex, jamIndex) {
+            data[rowIndex].jamOff.splice(jamIndex, 1);
+            calculateAllJamPutar();
+            renderTable();
+        }
+
+function editDate(index, type) {
+    currentEditIndex = index;
+    currentEditType = type;
+    
+    const row = data[index];
+    if (type === 'on') {
+        document.getElementById('dateSelect').value = row.date;
+        document.getElementById('monthSelect').value = row.month;
+        document.getElementById('yearSelect').value = row.year;
+    } else {
+        document.getElementById('dateSelect').value = row.dateOff;
+        document.getElementById('monthSelect').value = row.monthOff;
+        document.getElementById('yearSelect').value = row.yearOff;
+    }
+    
+    // Update day preview
+    updateDayPreview();
+    
+    // Add event listeners for auto-update
+    document.getElementById('dateSelect').onchange = updateDayPreview;
+    document.getElementById('monthSelect').onchange = updateDayPreview;
+    document.getElementById('yearSelect').onchange = updateDayPreview;
+    
+    document.getElementById('dateModal').style.display = 'block';
+}
+
+        function editTime(index, type, jamIndex) {
+            currentEditIndex = index;
+            currentEditType = type;
+            currentTimeIndex = jamIndex;
+            
+            const row = data[index];
+            if (type === 'on') {
+                document.getElementById('hourSelect').value = row.jamOn[jamIndex].hour;
+                document.getElementById('minuteSelect').value = row.jamOn[jamIndex].minute;
+            } else {
+                document.getElementById('hourSelect').value = row.jamOff[jamIndex].hour;
+                document.getElementById('minuteSelect').value = row.jamOff[jamIndex].minute;
+            }
+            
+            document.getElementById('timeModal').style.display = 'block';
+        }
+
+function saveDateEdit() {
+    const date = document.getElementById('dateSelect').value;
+    const month = document.getElementById('monthSelect').value;
+    const year = document.getElementById('yearSelect').value;
+    const day = getDayName(date, month, year); // Auto-calculate hari
+    
+    if (currentEditType === 'on') {
+        // Update tanggal ON
+        data[currentEditIndex].day = day;
+        data[currentEditIndex].date = date;
+        data[currentEditIndex].month = month;
+        data[currentEditIndex].year = year;
+        
+        // AUTO SYNC: Update tanggal OFF sama dengan ON
+        data[currentEditIndex].dayOff = day;
+        data[currentEditIndex].dateOff = date;
+        data[currentEditIndex].monthOff = month;
+        data[currentEditIndex].yearOff = year;
+    } else {
+        // Edit tanggal OFF tetap bisa manual (jika diperlukan)
+        data[currentEditIndex].dayOff = day;
+        data[currentEditIndex].dateOff = date;
+        data[currentEditIndex].monthOff = month;
+        data[currentEditIndex].yearOff = year;
+    }
+    
+    calculateAllJamPutar(); // Recalculate setelah update tanggal
+    closeDateModal();
+    renderTable();
+}
+
+        function saveTimeEdit() {
+            const hour = document.getElementById('hourSelect').value;
+            const minute = document.getElementById('minuteSelect').value;
+            
+            const row = data[currentEditIndex];
+            if (currentEditType === 'on') {
+                row.jamOn[currentTimeIndex].hour = hour;
+                row.jamOn[currentTimeIndex].minute = minute;
+            } else {
+                row.jamOff[currentTimeIndex].hour = hour;
+                row.jamOff[currentTimeIndex].minute = minute;
+            }
+            
+            // Recalculate jam putar
+            calculateAllJamPutar();
+            
+            closeTimeModal();
+            renderTable();
+        }
+
+        function closeDateModal() {
+            document.getElementById('dateModal').style.display = 'none';
+        }
+
+        function closeTimeModal() {
+            document.getElementById('timeModal').style.display = 'none';
+        }
+
+function calculateAllJamPutar() {
+    // Reset all jam putar lists
+    data.forEach(row => {
+        row.jamPutarList = [];
+    });
+
+    let lastJamPutar = 21.388; // Base value
+    
+    // Collect all jam ON and jam OFF with their row indices
+    let allJamOn = [];
+    let allJamOff = [];
+    
+    // Collect all jam ON times with row information
+    data.forEach((row, rowIndex) => {
+        row.jamOn.forEach(jamOn => {
+            allJamOn.push({
+                rowIndex: rowIndex,
+                time: `${jamOn.hour}.${jamOn.minute}`,
+                date: row.date,
+                month: row.month,
+                year: row.year,
+                hour: jamOn.hour,
+                minute: jamOn.minute
+            });
+        });
+        
+        row.jamOff.forEach(jamOff => {
+            allJamOff.push({
+                rowIndex: rowIndex,
+                time: `${jamOff.hour}.${jamOff.minute}`,
+                date: row.dateOff,
+                month: row.monthOff,
+                year: row.yearOff,
+                hour: jamOff.hour,
+                minute: jamOff.minute
+            });
+        });
+    });
+    
+    // Sort by row index to maintain order
+    allJamOn.sort((a, b) => {
+        if (a.rowIndex === b.rowIndex) {
+            return (parseInt(a.hour) * 60 + parseInt(a.minute)) - (parseInt(b.hour) * 60 + parseInt(b.minute));
+        }
+        return a.rowIndex - b.rowIndex;
+    });
+    
+    allJamOff.sort((a, b) => {
+        if (a.rowIndex === b.rowIndex) {
+            return (parseInt(a.hour) * 60 + parseInt(a.minute)) - (parseInt(b.hour) * 60 + parseInt(b.minute));
+        }
+        return a.rowIndex - b.rowIndex;
+    });
+    
+    // Match jam ON with jam OFF sequentially
+    let onIndex = 0;
+    let offIndex = 0;
+    let isFirstCalculation = true;
+    
+    while (onIndex < allJamOn.length && offIndex < allJamOff.length) {
+        const jamOn = allJamOn[onIndex];
+        const jamOff = allJamOff[offIndex];
+        
+        // Create proper Date objects for calculation
+        const onDate = new Date(
+            2000 + parseInt(jamOn.year),     // Full year
+            parseInt(jamOn.month) - 1,       // Month (0-indexed)
+            parseInt(jamOn.date),            // Date
+            parseInt(jamOn.hour),            // Hour
+            parseInt(jamOn.minute)           // Minute
+        );
+
+        const offDate = new Date(
+            2000 + parseInt(jamOff.year),    // Full year
+            parseInt(jamOff.month) - 1,      // Month (0-indexed)
+            parseInt(jamOff.date),           // Date
+            parseInt(jamOff.hour),           // Hour
+            parseInt(jamOff.minute)          // Minute
+        );
+
+        // Calculate hours worked using actual date difference
+        const hoursWorked = (offDate - onDate) / (1000 * 60 * 60); // Convert milliseconds to hours
+        
+        // Calculate jam putar
+        if (isFirstCalculation) {
+            // First calculation: base + (hours worked - 5) * 0.001
+            lastJamPutar = 21.388 + (hoursWorked - 5) * 0.001;
+            isFirstCalculation = false;
+        } else {
+            // Subsequent calculations: continue from last jam putar + hours worked * 0.001
+            lastJamPutar = lastJamPutar + (hoursWorked * 0.001);
+        }
+        
+        // Add jam putar to the row where jam OFF occurred
+        data[jamOff.rowIndex].jamPutarList.push(lastJamPutar);
+        
+        console.log(`Jam ON: ${jamOn.time} (${jamOn.date}/${jamOn.month}/${jamOn.year} - Row ${jamOn.rowIndex + 1}) -> Jam OFF: ${jamOff.time} (${jamOff.date}/${jamOff.month}/${jamOff.year} - Row ${jamOff.rowIndex + 1}) = ${hoursWorked.toFixed(2)} jam -> Jam Putar: ${lastJamPutar.toFixed(3)}`);
+        
+        onIndex++;
+        offIndex++;
+    }
+}
+
+        function addRow() {
+            const newRow = {
+                day: 'Senin',
+                date: '01',
+                month: '06',
+                year: '22',
+                dayOff: 'Senin',
+                dateOff: '01',
+                monthOff: '06',
+                yearOff: '22',
+                jamOn: [],
+                jamOff: [],
+                jamPutarList: []
+            };
+            
+            data.push(newRow);
+            calculateAllJamPutar();
+            renderTable();
+        }
+
+        function deleteRow(index) {
+            if (confirm('Yakin ingin menghapus baris ini?')) {
+                data.splice(index, 1);
+                calculateAllJamPutar();
+                renderTable();
+            }
+        }
+
+        function clearAll() {
+            if (confirm('Yakin ingin menghapus semua data?')) {
+                data = [];
+                renderTable();
+            }
+        }
+
+function exportData() {
+    // Generate timestamp untuk nama file
+    const now = new Date();
+    const timestamp = `${now.getDate().toString().padStart(2, '0')}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getFullYear()}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}`;
+    const fileName = `Timesheet_${timestamp}.xls`;
+    
+    // Generate HTML table untuk Excel (dengan ukuran lebih besar)
+    let html = '<html>';
+    html += '<head>';
+    html += '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
+    html += '<style>';
+    html += 'table { border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; }';
+    html += 'th, td { border: 1px solid #000; padding: 12px; text-align: center; vertical-align: middle; }'; // Padding diperbesar
+    html += 'th { background-color: #FFD700; font-weight: bold; font-size: 14px; height: 40px; }'; // Font header diperbesar
+    html += 'td { font-size: 13px; min-height: 35px; }'; // Font data diperbesar
+    html += '.jam-putar { background-color: #E8F5E8; font-weight: bold; }'; // Hijau muda untuk jam putar
+    html += '.no-col { background-color: #F5F5F5; font-weight: bold; width: 8%; }'; // Kolom nomor
+    html += '.tanggal-col { width: 20%; }'; // Kolom tanggal
+    html += '.jam-col { width: 15%; }'; // Kolom jam
+    html += '.jam-putar-col { width: 18%; }'; // Kolom jam putar
+    html += '</style>';
+    html += '</head>';
+    html += '<body>';
+    
+    // Tabel Data Utama (dengan kolom NO)
+    html += '<table>';
+    html += '<thead>';
+    html += '<tr>';
+    html += '<th class="no-col">NO</th>';
+    html += '<th class="tanggal-col">TANGGAL ON</th>';
+    html += '<th class="jam-col">JAM ON</th>';
+    html += '<th class="tanggal-col">TANGGAL OFF</th>';
+    html += '<th class="jam-col">JAM OFF</th>';
+    html += '<th class="jam-putar-col">JAM PUTAR</th>';
+    html += '</tr>';
+    html += '</thead>';
+    html += '<tbody>';
+    
+    // Data Rows
+    data.forEach((row, index) => {
+        const tanggalOn = `${row.day} / ${row.date}-${row.month}-${row.year}`;
+        const tanggalOff = `${row.dayOff} / ${row.dateOff}-${row.monthOff}-${row.yearOff}`;
+        
+        // Format jam ON (satu per baris jika multiple)
+        let jamOnList = '';
+        if (row.jamOn.length === 0) {
+            jamOnList = '-';
+        } else if (row.jamOn.length === 1) {
+            jamOnList = `${row.jamOn[0].hour}.${row.jamOn[0].minute}`;
+        } else {
+            jamOnList = row.jamOn.map(jo => `${jo.hour}.${jo.minute}`).join('<br>');
+        }
+        
+        // Format jam OFF (satu per baris jika multiple)
+        let jamOffList = '';
+        if (row.jamOff.length === 0) {
+            jamOffList = '-';
+        } else if (row.jamOff.length === 1) {
+            jamOffList = `${row.jamOff[0].hour}.${row.jamOff[0].minute}`;
+        } else {
+            jamOffList = row.jamOff.map(jo => `${jo.hour}.${jo.minute}`).join('<br>');
+        }
+        
+        // Format jam putar (satu per baris jika multiple)
+        let jamPutarList = '';
+        if (row.jamPutarList.length === 0) {
+            jamPutarList = '-';
+        } else if (row.jamPutarList.length === 1) {
+            jamPutarList = row.jamPutarList[0].toFixed(3);
+        } else {
+            jamPutarList = row.jamPutarList.map(jp => jp.toFixed(3)).join('<br>');
+        }
+        
+        html += '<tr>';
+        html += `<td class="no-col">${index + 1}</td>`;
+        html += `<td class="tanggal-col">${tanggalOn}</td>`;
+        html += `<td class="jam-col">${jamOnList}</td>`;
+        html += `<td class="tanggal-col">${tanggalOff}</td>`;
+        html += `<td class="jam-col">${jamOffList}</td>`;
+        html += `<td class="jam-putar jam-putar-col">${jamPutarList}</td>`;
+        html += '</tr>';
+    });
+    
+    html += '</tbody>';
+    html += '</table>';
+    
+    html += '</body>';
+    html += '</html>';
+    
+    // Download file
+    const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    // Show success message
+    alert(`✅ Excel berhasil diexport!\n📁 File: ${fileName}\n📊 Total: ${data.length} baris data`);
+}
+    </script>
+</body>
+</html>
